@@ -1,21 +1,21 @@
+/*Main sets up all the objects for the binary tree node and binaryTree class. It uses the binaryTree class to construct a binary tree out of a vector*/
 #include <iostream>
 #include <vector>
 #include "BinaryTree.h"
 #include "node.h"
-
 int main ()
 {
 	//objects
 	BinaryTree* binaryTree = new BinaryTree();
 	
 	//create vector and push back random values
-	std::vector<int> b_data;
-	b_data.push_back(12);
-	b_data.push_back(7);
-	b_data.push_back(10);
-	b_data.push_back(16);
-	b_data.push_back(22);
-	b_data.push_back(9);
+	std::vector<int>* b_data = new std::vector<int>;
+	(*b_data).push_back(12);
+	(*b_data).push_back(7);
+	(*b_data).push_back(10);
+	(*b_data).push_back(16);
+	(*b_data).push_back(22);
+	(*b_data).push_back(9);
 
 	//create new node - this is the root
 	node* treeRoot = new node;
@@ -24,13 +24,13 @@ int main ()
 	treeRoot->rightChild = nullptr;
 
 	//get size of vect 
-	int size = b_data.size();
+	int size = (*b_data).size();
 
 	//loop around vect creating binary tree
 	for (int i = 0; i < size; i ++)
 	{
 		//current vect var
-		int temp = b_data[i];
+		int temp = (*b_data)[i];
 		//insert new node into binary tree 
 		binaryTree->insertNode(temp, treeRoot);
 	}
@@ -73,6 +73,7 @@ int main ()
 	delete binaryTree;
 	delete treeRoot;
 	delete searchedNode; 
+	delete b_data;
 
 	return 0;
 }
