@@ -10,8 +10,9 @@ class BinaryTree
 public:
 	/*recursive function works down tree until finds null*/
 	void insertNode(int nodeData, node* currentNode);
+
 	/*searches tree for a value*/
-	node* traverseTree(int findData, node* currentNode);
+	node* traverseTree(node* currentNode);
 
 private:
 	/*fills the 'null' node discovered from instert node*/

@@ -35,33 +35,35 @@ int main ()
 		binaryTree->insertNode(temp, treeRoot);
 	}
 
+	//print root node
+	std::cout<< "Root Node: ";
+	std::cout << treeRoot->data << std::endl;
 
-	int value;
+	//set up binary tree to hold current node
+	node* searchedNode = new node;
+	*searchedNode = *treeRoot;
+
 	//do while loop - used for user to search tree
 	do
 	{
-		//get value to find
-		std::cout << "Enter a value to search: " << std::endl;
-		std::cin >> value;
+		//node for swapping
+		node* returnNode = new node;
+		
+		//go right down the tree
+		returnNode = binaryTree->traverseTree(searchedNode->rightChild);
+		*searchedNode = *returnNode;
 
-		//create a new 'temp' node to hold return
-		node* searchedNode = binaryTree->traverseTree(value, treeRoot); 
-
-		//make sure returned node is not null
+		//print node if it's not null
 		if(searchedNode != nullptr)
 		{	
 			//print the node data
-			std::cout<< "Node data: ";
-			std::cout<< searchedNode->data << std::endl; 	
+			std::cout<< "Right Child: ";
+			std::cout<< returnNode->data << std::endl; 	
 		}
 
-		//ask user if they would like to repeat - 1 for yes 0 for no
-		std::cout<< "would you like to search again? - yes/no (1/0)" << std::endl;
-		std::cin >> value;
-
-		//delete 'temp' node
-		delete searchedNode; 
-	}while(value != 0);
+		//clean up swapping node
+		delete returnNode;
+	}while(searchedNode->rightChild != nullptr);
 
 
 	//pause console
@@ -70,7 +72,7 @@ int main ()
 	//clean up objects 
 	delete binaryTree;
 	delete treeRoot;
-	
+	delete searchedNode; 
 
 	return 0;
 }

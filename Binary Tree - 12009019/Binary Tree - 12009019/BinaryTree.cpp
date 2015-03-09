@@ -38,34 +38,19 @@ void BinaryTree::insertNode(int nodeData, node* currentNode)
 	
 }
 
-/*public function works down the tree until the currentNodes data is matched with the findData parameter*/
-node* BinaryTree::traverseTree(int findData, node *currentNode)
+/*public function works down the tree returing nodes until node is null*/
+node* BinaryTree::traverseTree(node *currentNode)
 {
-	//if the current node is null - then findData doesn't exist in tree
+	//if the current node is null - then end of tree
 	if(currentNode == nullptr)
 	{
-		std::cout << "Value does not exsit!" << std::endl;
-
+		std::cout << "end of tree!" << std::endl;
 		return nullptr;
 	}
-	//if the currentNode data and findData match then node is discovered
-	else if (currentNode->data == findData)
+	//else return the child 
+	else
 	{
 		return  currentNode;
-	}
-	//if no match is found
-	else if (currentNode->data != findData)
-	{
-		//and the find data is greater than the currentNode data - go right
-		if(findData >= currentNode->data)
-		{
-			traverseTree(findData, currentNode->rightChild);
-		}
-		//otherwise go left!
-		else 
-		{
-			traverseTree(findData, currentNode->leftChild);
-		}
 	}
 }
 
