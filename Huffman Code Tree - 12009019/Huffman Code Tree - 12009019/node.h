@@ -1,11 +1,21 @@
 #ifndef _NODE_H_
 #define _NODE_H_
+#include "huffmanData.h"
 
-struct node{
-	char letter;
+class node{
+public:
 	int frequency;
-	node* leftChild;
-	node* rightChild;
+	data* root;
+	data* leftChild;
+	data* rightChild;
+};
+
+struct compareNode
+{
+	bool operator()(const node* a, const node* b)
+	{
+		return a->frequency > b->frequency;
+	}
 };
 
 #endif

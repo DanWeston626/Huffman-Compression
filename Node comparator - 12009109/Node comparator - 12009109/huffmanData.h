@@ -12,7 +12,7 @@ struct compare
 {
 	bool operator()(const data* a, const data* b)
 	{
-		return a->frequency < b->frequency;
+		return a->frequency > b->frequency;
 	}
 };
 
