@@ -8,6 +8,7 @@ public:
 	int frequency;
 };
 
+//letter frequencies with lowest frequency = highest priority
 struct compare
 {
 	bool operator()(const data* a, const data* b)

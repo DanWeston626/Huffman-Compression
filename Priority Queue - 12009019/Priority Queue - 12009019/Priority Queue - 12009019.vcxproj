@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9D7D58EE-5B7D-4F02-BB1F-7559D8F2957E}</ProjectGuid>
-    <RootNamespace>HuffmanCodeTree12009019</RootNamespace>
+    <ProjectGuid>{D54B51DB-3807-49BB-B831-AF70DA5C1B15}</ProjectGuid>
+    <RootNamespace>PriorityQueue12009019</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,11 +64,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="huffmanData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="huffmanData.h" />
-    <ClInclude Include="node.h" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

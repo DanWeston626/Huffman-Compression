@@ -1,17 +1,7 @@
-#include "huffmanData.h"
-#include "node.h"
-#include <iostream>
-#include <queue>
-#include <vector>
-using std::priority_queue;
-using std::vector;
-using std::cout;
-using std::cin;
+#include "huffmanTree.h"
 
-
-
-
-int main ()
+//populate priority queue for huffman code tree
+void huffmanTree::createLeafNodes()
 {
 	//create vector to store data for queue
 	vector<data*>* leafNodes = new vector<data*>;
@@ -47,7 +37,6 @@ int main ()
 	(*leafNodes)[5]->letter = 'g';
 	(*leafNodes)[5]->frequency = 38;
 
-
 	//set up priority queue
 	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
 	//add all leaf nodes to queue
@@ -56,6 +45,14 @@ int main ()
 		huffmanQueue->push((leafNodes)->at(i));
 	}
 
+	delete leafNodes;
+
+	createHuffmanTree(huffmanQueue);
+}
+
+//create huffman code tree
+void huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffQueue)
+{
 	//set up new priority queue for huffman tree
 	priority_queue<node*, vector<node*>, compareNode>* huffmanTree = new priority_queue<node*, vector<node*>, compareNode>;
 
@@ -73,28 +70,28 @@ int main ()
 		_node = new node;
 		parent->push_back(_node);
 
-		//fail safe check
-		if(huffmanQueue->top() != nullptr)
+		//make sure that the top is not null
+		if(huffQueue->top() != nullptr)
 		{
 			//remove first node from tree
-			_leaf = huffmanQueue->top();
+			_leaf = huffQueue->top();
 			(*parent)[pos]->leftChild = new data;
 			(*parent)[pos]->leftChild = _leaf;
 			lFreq = _leaf->frequency;
-			huffmanQueue->pop();	
+			huffQueue->pop();	
 
 			(*parent)[pos]->frequency = lFreq;
 		}
 
-		//make sure
-		if(!(huffmanQueue->size() <=1))
+		//If the current size is equal to one then parent has been found
+		if(!(huffQueue->size() <=1))
 		{
 			//remove next node in tree and place as right child
-			_leaf = huffmanQueue->top();
+			_leaf = huffQueue->top();
 			(*parent)[pos]->rightChild = new data; //create right child
 			(*parent)[pos]->rightChild = _leaf; //place first node to right child
 			rFreq = _leaf->frequency; //get frequency of current node
-			huffmanQueue->pop();
+			huffQueue->pop();
 
 			//set the frequency of current node to combined freq of node 1 and 2
 			freq = lFreq + rFreq;
@@ -104,31 +101,20 @@ int main ()
 		//push two nodes back into queue
 		huffmanTree->push((parent)->at(pos));
 		pos++;	
-
-	}while(huffmanQueue->size() > 1);
+	}while(huffQueue->size() > 1);
 	//loop while more than one node in queue
 
 	//create root node with last node in the huffmanQueue
 	_node = new node;
 	parent->push_back(_node);
-	_leaf = huffmanQueue->top();
-	(*parent)[pos]->root = new data;
-	(*parent)[pos]->root = _leaf;
+	_leaf = huffQueue->top(); 
+	(*parent)[pos]->leftChild = new data;
+	(*parent)[pos]->leftChild = _leaf;
 	(*parent)[pos]->frequency = _leaf ->frequency;
-	huffmanQueue->pop();
+	huffQueue->pop();
 
 	huffmanTree->push((parent)->at(pos));
 
-	//pause console
-	cin.get();
-
-	//clean up objects	
-	delete leafNodes;
-	delete huffmanQueue;
+	delete huffQueue;
 	delete huffmanTree;
-	delete parent;
-	delete _node;
-	delete _leaf;
-	delete mData;
 }
-
