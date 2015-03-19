@@ -1,10 +1,6 @@
 #include "huffmanTree.h"
 #include <iostream>
 using std::cin;
-
-
-
-
 void main ()
 {
 	//create huffman tree object

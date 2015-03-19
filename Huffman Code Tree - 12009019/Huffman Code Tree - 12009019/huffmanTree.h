@@ -4,7 +4,6 @@ a huffman code tree in the createHuffmanTree function*/
 #ifndef _HUFFMANTREE_H_
 #define _HUFFMANTREE_H_
 #include "huffmanData.h"
-#include "node.h"
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -18,10 +17,9 @@ using std::string;
 class huffmanTree
 {
 public:
+	//fills priority queue with leaf nodes
 	void createLeafNodes();
-
+	//uses leaf nodes for createLeafNodes to create a priority tree
 	void createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffQueue);
-
-
 };
 #endif
