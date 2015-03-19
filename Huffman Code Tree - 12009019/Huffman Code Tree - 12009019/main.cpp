@@ -5,7 +5,7 @@ using std::cin;
 
 
 
-int main ()
+void main ()
 {
 	//create huffman tree object
 	huffmanTree* huffTree = new huffmanTree();	

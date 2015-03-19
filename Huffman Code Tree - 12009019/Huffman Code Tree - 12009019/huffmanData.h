@@ -1,11 +1,15 @@
 #ifndef _HUFFMANDATA_H_
 #define _HUFFMANDATA_H_
+#include <iostream>
+using std::string;
 
 //class for huffman leaf nodes
 class data{
 public:
-	char letter;
+	string letter;
 	int frequency;
+	data* leftChild;
+	data* rightChild;
 };
 
 //custom comparator for the data class

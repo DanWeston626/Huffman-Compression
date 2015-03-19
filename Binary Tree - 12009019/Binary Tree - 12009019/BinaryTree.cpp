@@ -4,7 +4,7 @@
 when the child node is null, the function inserts a new node and fills the data using the fill node funciton*/
 void BinaryTree::insertNode(int nodeData, node* currentNode)
 {
-	//if the current data is less than the currentNodes data then go lef
+	//if the current data is less than the currentNodes data then go left
 	if(nodeData < currentNode->data)
 	{
 		//if the current nodes left child is not null the move down again
