@@ -35,7 +35,7 @@ public:
 	//produces a set of huffman codes for the huffman code tree
 	void createHuffmanCodes(priority_queue<data*, vector<data*>, compare>* huffmanTree);
 
-	void generateCode(data *tree,  map<string, string> &codes, string &code, string startBit);
+	void generateCode(data *tree,  map<string, string> &codes, string &code);
 
 	string code; 
 

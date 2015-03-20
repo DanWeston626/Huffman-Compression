@@ -130,30 +130,35 @@ void huffmanTree::createHuffmanCodes(priority_queue<data*, vector<data*>, compar
 	string codeString;
 	map<string, string>* codeMap = new map<string,string>;
 
-	codeString =  "0";
-	generateCode(tree->leftChild, (*codeMap), codeString, "0");
+	//codeString =  "0";
+	generateCode(tree, (*codeMap), codeString);
 	codeString.clear();
-	codeString = "1";
-	generateCode(tree->rightChild, (*codeMap), codeString, "1");
+	//codeString = "1";
+	//generateCode(tree->rightChild, (*codeMap), codeString, "1");
 
 	//clean up objects
 	delete huffmanTree;
 }
 
-void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, string &code, string startBit)
+void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, string &code)
 {
 	if((*currentNode).leftChild == nullptr && (*currentNode).rightChild == nullptr)
-	{
+	{		
+		//parentCode += code;
 		codes.insert(std::make_pair(currentNode->letter, code));
-		code.pop_back();
 	}	
- 	if((*currentNode).leftChild != nullptr)
+ 	if((*currentNode).leftChild != nullptr)	
 	{
-		generateCode(currentNode->leftChild, codes, code +="0", startBit);		
-	}
-	if((*currentNode).rightChild != nullptr)
-	{
-		generateCode(currentNode->rightChild, codes, code += "1", startBit);		
+		generateCode(currentNode->leftChild, codes, code += "0");
 	} 
-	
+	if((*currentNode).rightChild != nullptr)	
+	{
+		generateCode(currentNode->rightChild, codes, code += "1");	
+	}
+
+	//make sure string is not empty
+	if(!(code.empty()))
+	{
+		code.pop_back();
+	}
 }
