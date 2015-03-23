@@ -6,6 +6,7 @@ void main ()
 	//create huffman tree object
 	huffmanTree* huffTree = new huffmanTree();	
 
+	//start tree creation
 	huffTree->createLeafNodes();
 
 	//pause console

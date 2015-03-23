@@ -9,17 +9,17 @@ a huffman code tree in the createHuffmanTree function*/
 #include <vector>
 #include <map>
 #include <set>
+#include <fstream>
 
-//using std::priority_queue;
-//using std::vector;
-//using std::cout;
-//using std::cin;
-//using std::string;
-//using std::map;
+using std::priority_queue;
+using std::vector;
+using std::cout;
+using std::cin;
+using std::endl;
+using std::string;
+using std::map;
 
-using namespace std;
-
-struct huffmanCodes{
+struct characterFreq{
 	string character;
 	int code; 
 };
@@ -27,17 +27,15 @@ struct huffmanCodes{
 class huffmanTree
 {
 public:
+	//returns contense of a given file
+	string returnFile(string message);
+	void calFreq(map<char, int> & freqMap, string input);
 
 	//fills priority queue with leaf nodes
 	void createLeafNodes();
 	//uses leaf nodes for createLeafNodes to create a priority tree
 	void createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree);
-	//produces a set of huffman codes for the huffman code tree
-	void createHuffmanCodes(priority_queue<data*, vector<data*>, compare>* huffmanTree);
-
+	//generates the set of huffman codes from a huffman tree
 	void generateCode(data *tree,  map<string, string> &codes, string &code);
-
-	string code; 
-
 };
 #endif

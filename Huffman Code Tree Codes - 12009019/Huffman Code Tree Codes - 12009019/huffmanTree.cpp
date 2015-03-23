@@ -2,66 +2,107 @@
 
 #include <string>
 
+
+//open file and return contense in a string variable
+string huffmanTree::returnFile(string message)
+{
+	
+	/*create file object*/
+	std::ifstream infile;
+	/*open text file*/
+	infile.open("richardiii.txt");
+	/*read file, store contense to message string*/
+	getline(infile,message);
+	/*close file*/
+	infile.close();
+
+	return message;
+}
+
+/*place the charatcers of the string into the map, if the character is already in the map
+increment the frequency of the charatcer*/
+void huffmanTree::calFreq(map<char, int> &freqMap, string input)
+{
+    //iterator for &freqMap
+	map<char, int>::iterator* inputMap = new map<char, int>::iterator;
+
+	//loop over the input string length
+	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
+	{
+		//take the current charatcer of the string and assign to char
+		char currentChar = input[chrPos];
+
+		//search the map for current char
+		(*inputMap) = freqMap.find(currentChar);
+
+		//if current letter was not located in map
+		if((*inputMap) == freqMap.end())
+		{
+			//add current letter and +1 freq to map
+			freqMap.insert(std::make_pair(currentChar,1));
+		}
+		else 
+		{
+			//increment the character frequency
+			(*inputMap)->second++;
+		}
+	}
+
+	//delete dynamic map
+	delete inputMap;
+}
+
+
 //populate priority queue for huffman code tree
 void huffmanTree::createLeafNodes()
 {
-	//create vector to store data for queue
-	vector<data*>* leafNodes = new vector<data*>;
+	//get file contense
+	string input;
+	input = returnFile(input);
 
-	//create leaf nodes
-	data *mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[0]->letter = "r";
-	(*leafNodes)[0]->frequency = 1;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[1]->letter = "n";
-	(*leafNodes)[1]->frequency = 1;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[2]->letter = "e";
-	(*leafNodes)[2]->frequency = 2;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[3]->letter = "b";
-	(*leafNodes)[3]->frequency = 2;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[4]->letter = "t";
-	(*leafNodes)[4]->frequency = 3;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[5]->letter = "o";
-	(*leafNodes)[5]->frequency = 4;
-
-	mData =  new data;
-	leafNodes->push_back(mData);
-	(*leafNodes)[6]->letter = "_";
-	(*leafNodes)[6]->frequency = 5;
-
+	//set up map to store character freqs 
+	map<char, int>* freqMap = new map<char, int>;
+	//cal freq for input string and store in above map
+	calFreq((*freqMap), input);
 
 	//set up priority queue
 	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
-	//add all leaf nodes to queue
-	for(int i = 0; i < leafNodes->size(); i ++)
+
+	//create a new leaf for queue
+	data* leaf;
+	//loop over map
+	for(auto it = (*freqMap).cbegin(); it != (*freqMap).cend(); ++it)
 	{
-		huffmanQueue->push((leafNodes)->at(i));
+		//get data from map
+		leaf = new data;
+		leaf->letter = (*it).first;
+		leaf->frequency = (*it).second;
+
+		//push back new leaf into priority queue
+		huffmanQueue->push(leaf);
+	}
+	
+	cout<<"Character and Frequencies: " << endl;
+
+	 //print frequencies and characters
+	for(auto it = (*freqMap).cbegin(); it != (*freqMap).cend(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
 	}
 
+	//create a tree from data in queue
 	createHuffmanTree(huffmanQueue);
 
-	//clean up objects
-	delete leafNodes;
+	//clean up ojects 
+	delete freqMap;
 }
 
 //create huffman code tree
 void huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree)
 {
+	cout << "Creating huffman tree from data!" << endl; 
+	cout << endl;
+
 	//create vector to store parent nodes
 	vector<data*>* parent = new vector<data*>;
 	data* _node;
@@ -109,44 +150,40 @@ void huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare
 		//push combined nodes back into queue	
 		huffmanTree->push((parent)->at(pos));
 		pos++;	
-	}
-	delete parent;
+	}	
 
-	//create huffman codes for nodes in tree
-	createHuffmanCodes(huffmanTree);
-}
 
-//produce huffman codes for tree
-void huffmanTree::createHuffmanCodes(priority_queue<data*, vector<data*>, compare>* huffmanTree)
-{
-	//get tree in vect 
-	vector<data*>* huffTree = new vector<data*>;
-	data* tree = new data;
-	huffTree->push_back(tree);
-	(*huffTree)[0] = huffmanTree->top();
-	//huffmanTree->pop();
-
-	tree = (*huffTree)[0];
 	string codeString;
 	map<string, string>* codeMap = new map<string,string>;
 
-	//codeString =  "0";
-	generateCode(tree, (*codeMap), codeString);
-	codeString.clear();
-	//codeString = "1";
-	//generateCode(tree->rightChild, (*codeMap), codeString, "1");
+	//call generateCode to generate codes from tree
+	generateCode(huffmanTree->top(), (*codeMap), codeString);
+	
+	cout<<"Huffman Codes From Data: " << endl;
+
+	 //print codes
+	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
+	}
 
 	//clean up objects
 	delete huffmanTree;
+	delete codeMap;
+	delete parent;
 }
 
+
+//function creates huffman codes for nodes in a huffman tree
 void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, string &code)
 {
+	//if the left and right child is null - end of tree
 	if((*currentNode).leftChild == nullptr && (*currentNode).rightChild == nullptr)
 	{		
-		//parentCode += code;
 		codes.insert(std::make_pair(currentNode->letter, code));
 	}	
+
+	//else recursivally call function - working down tree
  	if((*currentNode).leftChild != nullptr)	
 	{
 		generateCode(currentNode->leftChild, codes, code += "0");
@@ -159,6 +196,7 @@ void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, st
 	//make sure string is not empty
 	if(!(code.empty()))
 	{
+		//when string is empty and function recursives - pop back last couple of values
 		code.pop_back();
 	}
 }
