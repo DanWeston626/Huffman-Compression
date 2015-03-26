@@ -4,18 +4,18 @@
 
 
 //open file and return contense in a string variable
-string huffmanTree::returnFile(string message)
-{
-	
+string huffmanTree::returnFile(string fileName)
+{	
+	string message;
 	/*create file object*/
 	std::ifstream infile;
 	/*open text file*/
-	infile.open("richardiii.txt");
+	infile.open(fileName);
 	/*read file, store contense to message string*/
 	getline(infile,message);
 	/*close file*/
 	infile.close();
-
+	/*return file*/
 	return message;
 }
 
@@ -47,27 +47,13 @@ void huffmanTree::calFreq(map<char, int> &freqMap, string input)
 			(*inputMap)->second++;
 		}
 	}
-
 	//delete dynamic map
 	delete inputMap;
 }
 
-
 //populate priority queue for huffman code tree
-void huffmanTree::createLeafNodes()
+void huffmanTree::createLeafNodes(map<char, int>* freqMap, priority_queue<data*, vector<data*>, compare>* huffmanQueue)
 {
-	//get file contense
-	string input;
-	input = returnFile(input);
-
-	//set up map to store character freqs 
-	map<char, int>* freqMap = new map<char, int>;
-	//cal freq for input string and store in above map
-	calFreq((*freqMap), input);
-
-	//set up priority queue
-	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
-
 	//create a new leaf for queue
 	data* leaf;
 	//loop over map
@@ -81,33 +67,17 @@ void huffmanTree::createLeafNodes()
 		//push back new leaf into priority queue
 		huffmanQueue->push(leaf);
 	}
-	
-	cout<<"Character and Frequencies: " << endl;
-
-	 //print frequencies and characters
-	for(auto it = (*freqMap).cbegin(); it != (*freqMap).cend(); ++it)
-	{
-		cout << it->first << " " << it->second << endl;
-	}
-
-	//create a tree from data in queue
-	createHuffmanTree(huffmanQueue);
-
-	//clean up ojects 
-	delete freqMap;
 }
 
 //create huffman code tree
-void huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree)
+data huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree)
 {
-	cout << "Creating huffman tree from data!" << endl; 
-	cout << endl;
-
 	//create vector to store parent nodes
 	vector<data*>* parent = new vector<data*>;
 	data* _node;
 	data* _firstLeaf;
 	data* _secondLeaf;
+	data* _parentNode;
 	int pos = 0;
 	//create huffman tree
 	while (huffmanTree->size() > 1)
@@ -152,51 +122,113 @@ void huffmanTree::createHuffmanTree(priority_queue<data*, vector<data*>, compare
 		pos++;	
 	}	
 
+	//create root node
+	_parentNode = huffmanTree->top();
+	huffmanTree->pop();
 
-	string codeString;
-	map<string, string>* codeMap = new map<string,string>;
-
-	//call generateCode to generate codes from tree
-	generateCode(huffmanTree->top(), (*codeMap), codeString);
-	
-	cout<<"Huffman Codes From Data: " << endl;
-
-	 //print codes
-	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
-	{
-		cout << it->first << " " << it->second << endl;
-	}
-
-	//clean up objects
-	delete huffmanTree;
-	delete codeMap;
-	delete parent;
+	return *_parentNode;	
 }
 
-
 //function creates huffman codes for nodes in a huffman tree
-void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, string &code)
+void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, string code)
 {
 	//if the left and right child is null - end of tree
 	if((*currentNode).leftChild == nullptr && (*currentNode).rightChild == nullptr)
 	{		
 		codes.insert(std::make_pair(currentNode->letter, code));
 	}	
-
 	//else recursivally call function - working down tree
  	if((*currentNode).leftChild != nullptr)	
 	{
-		generateCode(currentNode->leftChild, codes, code += "0");
+		generateCode(currentNode->leftChild, codes, code + "0");
 	} 
 	if((*currentNode).rightChild != nullptr)	
 	{
-		generateCode(currentNode->rightChild, codes, code += "1");	
+		generateCode(currentNode->rightChild, codes, code + "1");	
+	}
+}
+
+void huffmanTree::compress(map<string, string> &codes, string input)
+{
+	//iterator for codeMap
+	map<string, string>::iterator* inputMap = new map<string, string>::iterator;
+	
+	string bitStream;
+	string currentCode;
+
+	//loop over the input string length
+	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
+	{
+		//get the current character in string
+		string currentChar;	
+		currentChar = input[chrPos];
+
+		//search the map for current char
+		(*inputMap) = codes.find(currentChar);
+		//add current byte to stream
+		currentCode += (*inputMap)->second;	
+	
 	}
 
-	//make sure string is not empty
-	if(!(code.empty()))
+	//if there are left over bits add extra 0's as overflow
+	bool loop = true;
+	while(loop)
 	{
-		//when string is empty and function recursives - pop back last couple of values
-		code.pop_back();
+		//if the current string length isnt divisble by 8
+		if (!(currentCode.length() % 8 == 0))
+		{
+			//add extra zeros
+			currentCode += "0";
+		}
+		//string is divisble by 8 end
+		else 
+		{
+			loop = false;
+		}
 	}
+
+	//open/create file to write bit stream too
+	std::fstream file;
+
+	//open output file and clear content 
+	file.open("output.dat", std::fstream::out | std::fstream::trunc);
+
+	//write out bitstream 
+	for (int i = 0; i < currentCode.length(); i +=8)
+	{
+		unsigned char byte = 0;
+		string eightBits;
+
+		//if there are 8 avaible bits
+		if(i+8 < currentCode.length())
+		{
+			//copy eight bits into string
+			eightBits = currentCode.substr(i, 8);
+		}
+		else 
+		{
+			//just get remaining bits
+			eightBits = currentCode.substr(i, currentCode.length());
+		}
+
+		//loop over eight bits in substring
+		for (unsigned bit = 0; bit != 8; ++bit)
+		{
+			if (bit < eightBits.length())
+			{
+				byte |= (eightBits[bit] & 1) << bit;
+			}
+			else
+			{
+				byte |= 1 << bit;
+			}
+
+		} 
+		//place new byte in file
+		file.put(byte);
+	}
+	//close file
+	file.close();
+	//clean up objects 
+	delete inputMap;
 }
