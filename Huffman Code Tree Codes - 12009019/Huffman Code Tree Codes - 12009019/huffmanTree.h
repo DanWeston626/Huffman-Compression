@@ -39,7 +39,16 @@ public:
 	data createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree);
 	//generates the set of huffman codes from a huffman tree
 	void generateCode(data *tree,  map<string, string> &codes, string code);
+	
+	//encode the huffman tree ready for compress 
+	void encodeTree(data* rootNode, string &stream);
 	//creates a bit stream using discoverd huffman codes
-	void compress(map <string, string> &codes, string input);
+	void compress(map <string, string> &codes, string input, data* _parentNode, string huffmanTable);
+
+
+
+	
+
+
 };
 #endif

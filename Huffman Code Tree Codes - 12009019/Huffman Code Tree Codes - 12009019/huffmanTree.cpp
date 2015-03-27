@@ -1,7 +1,7 @@
 #include "huffmanTree.h"
 
 #include <string>
-
+#include <bitset>
 
 //open file and return contense in a string variable
 string huffmanTree::returnFile(string fileName)
@@ -148,7 +148,7 @@ void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, st
 	}
 }
 
-void huffmanTree::compress(map<string, string> &codes, string input)
+void huffmanTree::compress(map<string, string> &codes, string input, data* parentNode, string _huffmanTree)
 {
 	//iterator for codeMap
 	map<string, string>::iterator* inputMap = new map<string, string>::iterator;
@@ -188,10 +188,19 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	}
 
 	//open/create file to write bit stream too
-	std::fstream file;
+	std::fstream *file = new std::fstream;
 
 	//open output file and clear content 
-	file.open("output.dat", std::fstream::out | std::fstream::trunc);
+	file->open("output.dat", std::fstream::out | std::fstream::trunc);
+
+	//write out encoded tree
+	for(int i = 0; i < _huffmanTree.length();i ++)
+	{
+		unsigned char huffbit = _huffmanTree[i];
+		file->put(huffbit);
+	}
+
+	file->put(' ');
 
 	//write out bitstream 
 	for (int i = 0; i < currentCode.length(); i +=8)
@@ -225,10 +234,29 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 
 		} 
 		//place new byte in file
-		file.put(byte);
+		file->put(byte);
 	}
 	//close file
-	file.close();
+	file->close();
 	//clean up objects 
 	delete inputMap;
+}
+
+void huffmanTree::encodeTree(data* currentNode, string &stream)
+{
+	static string byte = "";
+	//if node is a leaf node
+	if((*currentNode).leftChild == nullptr && (*currentNode).rightChild == nullptr)
+	{
+		byte += "1";
+		byte += currentNode->letter;
+	}
+	else
+	{
+		byte += "0";
+		encodeTree(currentNode->leftChild, stream + "0");
+		encodeTree(currentNode->rightChild, stream);
+	}	
+
+	stream = byte;
 }

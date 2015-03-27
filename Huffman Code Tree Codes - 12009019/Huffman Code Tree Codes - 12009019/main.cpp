@@ -2,7 +2,10 @@
 #include <iostream>
 #include <string>
 
+#include <fstream>
+
 using namespace std;
+
 void main ()
 {
 	//Objects
@@ -10,6 +13,7 @@ void main ()
 	//Variables
 	string* inputFile = new string;
 	string* fileContent = new string;
+	string* bitStream = new string;
 	data* parentNode = new data;
 	map<char, int>* freqMap = new map<char, int>;
 	map<string, string>* codeMap = new map<string,string>;
@@ -51,8 +55,11 @@ void main ()
 		cout << it->first << " " << it->second << endl;
 	}
 
+	string huffmanTable;
+	huffTree->encodeTree(parentNode, huffmanTable);
+
 	//compress data
-	huffTree->compress((*codeMap), *fileContent);
+	huffTree->compress((*codeMap), *fileContent, parentNode, huffmanTable);
 
 
 	//pause console
