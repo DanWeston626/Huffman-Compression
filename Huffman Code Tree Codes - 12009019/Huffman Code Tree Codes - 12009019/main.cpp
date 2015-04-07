@@ -58,6 +58,7 @@ void main ()
 	//compress data
 	huffTree->compress((*codeMap), *fileContent);
 
+	huffTree->decompress();
 
 	//pause console
 	cin.ignore();

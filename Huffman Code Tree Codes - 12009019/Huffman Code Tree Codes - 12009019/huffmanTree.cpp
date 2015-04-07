@@ -187,10 +187,10 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		}
 	}
 
-		//open/create file to write bit stream too
+	//open/create file to write bit stream too
 	std::fstream *file = new std::fstream;
 	//open output file and clear content 
-	file->open("output.dat", std::fstream::out | std::fstream::trunc);
+	file->open("output.dat", std::fstream::out |std::fstream::binary | std::fstream::trunc);
 
 	//write out number of codes
 	unsigned char codeAmount = codes.size();
@@ -199,16 +199,17 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	//character as 8 bits 
 	for (auto const &it1 : codes)
 	{		
-		char m_char = it1.first[0];
+		unsigned char m_char = it1.first[0];
 		file->put(m_char);	
 
 		//size of code
-		const char sizeOfCode = it1.second.size();
-		file->put(sizeOfCode);	
+		char sizeOfCode = it1.second.size();
+		//file->put(sizeOfCode);
+		*file << sizeOfCode;
 
 		unsigned char code = 0;
 		//followed by code
-		for (unsigned bit = 0; bit != 8; ++bit)
+		for (unsigned bit = 0; bit != sizeOfCode; ++bit)
 		{
 			if (bit < it1.second.length())
 			{
@@ -221,8 +222,6 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 
 		} 
 		file->put(code);	
-
-
 	}	
 
 	file->put(' ');
@@ -266,6 +265,67 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	file->close();
 	//clean up objects 
 	delete inputMap;
+	delete file;
 }
 
 
+void huffmanTree::decompress()
+{
+	char fileBit;
+	char code;
+	int amountOfCodes;
+	int sizeOfCode;
+	
+	map<string, string>* codeMap = new map<string,string>;
+
+	//open/create file to write bit stream too
+	std::ifstream *file = new std::ifstream;
+	//open output file and clear content 
+	file->open("output.dat", std::ios::binary | std::ios::in);
+
+	
+	file->get(fileBit);
+	amountOfCodes = fileBit;
+
+	for (int i = 0; i < amountOfCodes; i ++)
+	{
+		//get the character
+		file->get(fileBit);
+		unsigned char bit = fileBit;
+		
+		//get size of code
+		file->get(fileBit);
+		int codeSize = fileBit;
+
+		////get code
+		file->get(fileBit);
+		unsigned char temp = fileBit;
+		
+		string binary;
+		for (unsigned char i = 128, j = 0; i > 0; i >>= 1, j++)
+		{
+			if (j == codeSize)
+			{
+				break;
+			}
+			//binary += temp&i ? '1':'0';
+
+			binary += (temp % 2) + '0';
+			temp /= 2;
+		}
+
+		string gawd;
+		gawd.push_back(bit);
+		codeMap->insert(std::make_pair(gawd, binary));
+
+	}
+	
+	file->close();
+
+	cout<<"Huffman Codes From File: " << endl;
+	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
+	}
+
+}

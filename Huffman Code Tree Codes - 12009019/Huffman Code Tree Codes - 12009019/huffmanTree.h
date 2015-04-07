@@ -43,5 +43,7 @@ public:
 	//creates a bit stream using discoverd huffman codes
 	void compress(map <string, string> &codes, string input);
 
+	void decompress();
+
 };
 #endif
