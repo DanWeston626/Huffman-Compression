@@ -6,17 +6,47 @@
 
 using namespace std;
 
+void compressFile();
+void decompressFile();
+
 void main ()
+{
+	//print menu 
+	
+	int choice;
+	cout << "\t****HUFFMAN COMPRESSION****" << endl;
+	cout << "\t1. Compress File" << endl;
+	cout << "\t2. Decompress File" << endl;
+	cout << "\t3. Exit" << endl;
+
+	cin >> choice;
+
+	switch (choice)
+	{
+		case 1:
+		{
+			compressFile();
+		}
+		case 2:
+		{
+			decompressFile();
+		}
+		case 3:
+		{
+			decompressFile();
+		}
+	}
+	
+}
+
+void compressFile()
 {
 	//Objects
 	huffmanTree* huffTree = new huffmanTree();	
-	//Variables
-	string* decompress = new string;
 	string* inputFile = new string;
 	string* fileContent = new string;
 	string* bitStream = new string;
 	data* parentNode = new data;
-	data* decompressNode = new data;
 	map<char, int>* freqMap = new map<char, int>;
 	map<string, string>* codeMap = new map<string,string>;
 	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
@@ -60,7 +90,24 @@ void main ()
 	//compress data
 	huffTree->compress((*codeMap), *fileContent);
 
-	//empty the code map
+	delete huffmanQueue;
+	delete parentNode;
+	delete freqMap;
+	delete codeMap;
+	delete fileContent;
+	delete inputFile;
+
+
+	main();
+}
+
+void decompressFile()
+{
+	huffmanTree* huffTree = new huffmanTree();	
+	string* decompress = new string;
+	data* decompressNode = new data;
+	map<string, string>* codeMap = new map<string,string>;
+		//empty the code map
 	(*codeMap).clear();
 
 	//open/create file to write bit stream too
@@ -93,12 +140,8 @@ void main ()
 	delete file;
 	delete decompress;
 	delete huffTree;
-	delete huffmanQueue;
-	delete parentNode;
-	delete freqMap;
-	delete codeMap;
-	delete fileContent;
-	delete inputFile;
 	delete decompressNode;
-}
+	delete huffTree;
 
+	main();
+}

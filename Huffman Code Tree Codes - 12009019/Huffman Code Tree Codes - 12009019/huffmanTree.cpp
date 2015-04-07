@@ -325,7 +325,7 @@ string huffmanTree::getMessage(std::ifstream *outputfile)
 
 	return message;
 }
-
+//decompress message takes the string from get message and 
 void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string message)
 {
 	//starting positon for substring
