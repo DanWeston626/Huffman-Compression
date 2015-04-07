@@ -11,10 +11,12 @@ void main ()
 	//Objects
 	huffmanTree* huffTree = new huffmanTree();	
 	//Variables
+	string* decompress = new string;
 	string* inputFile = new string;
 	string* fileContent = new string;
 	string* bitStream = new string;
 	data* parentNode = new data;
+	data* decompressNode = new data;
 	map<char, int>* freqMap = new map<char, int>;
 	map<string, string>* codeMap = new map<string,string>;
 	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
@@ -58,14 +60,38 @@ void main ()
 	//compress data
 	huffTree->compress((*codeMap), *fileContent);
 
-	huffTree->decompress();
+	//empty the code map
+	(*codeMap).clear();
 
+	//open/create file to write bit stream too
+	std::ifstream *file = new std::ifstream;
+
+	//open output file and clear content 
+	file->open("output.dat", std::ios::binary | std::ios::in);
+
+	//decompress file and get tree
+	huffTree->getTree((*codeMap), file);
+
+	//get compressed bitstream
+	*decompress = huffTree->getMessage(file);
+	file->close();
+
+	cout<<endl;
+	cout<<"Huffman Codes From File: " << endl;
+	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
+	}
+
+	huffTree->decompressMessage((*codeMap), *decompress);
+	
 	//pause console
 	cin.ignore();
-	cin.get();
-	
+	cin.get();	
 
 	//clean up objects 
+	delete file;
+	delete decompress;
 	delete huffTree;
 	delete huffmanQueue;
 	delete parentNode;
@@ -73,5 +99,6 @@ void main ()
 	delete codeMap;
 	delete fileContent;
 	delete inputFile;
+	delete decompressNode;
 }
 

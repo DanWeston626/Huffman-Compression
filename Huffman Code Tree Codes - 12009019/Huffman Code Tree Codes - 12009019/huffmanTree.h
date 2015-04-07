@@ -21,10 +21,6 @@ using std::endl;
 using std::string;
 using std::map;
 
-struct characterFreq{
-	string character;
-	int code; 
-};
 
 class huffmanTree
 {
@@ -37,13 +33,21 @@ public:
 	void createLeafNodes(map<char, int>* freqMap, priority_queue<data*, vector<data*>, compare>* huffmanQueue);
 	//uses leaf nodes for createLeafNodes to create a priority tree
 	data createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree);
+
+	
 	//generates the set of huffman codes from a huffman tree
 	void generateCode(data *tree,  map<string, string> &codes, string code);
 	
 	//creates a bit stream using discoverd huffman codes
 	void compress(map <string, string> &codes, string input);
 
-	void decompress();
+	//decompress binary tree from file 
+	void getTree(map<string, string> & huffCodeMap, std::ifstream *outputFile);
+
+	//decompress message from file
+	string getMessage(std::ifstream *outputfile);
+
+	void decompressMessage(map<string, string> & huffCodeMap, string message);
 
 };
 #endif

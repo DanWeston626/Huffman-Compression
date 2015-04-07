@@ -1,8 +1,10 @@
 #include "huffmanTree.h"
 
+#include <iterator> 
 #include <string>
 #include <bitset>
 
+using namespace std;
 //open file and return contense in a string variable
 string huffmanTree::returnFile(string fileName)
 {	
@@ -170,6 +172,8 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	
 	}
 
+
+
 	//if there are left over bits add extra 0's as overflow
 	bool loop = true;
 	while(loop)
@@ -196,37 +200,23 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	unsigned char codeAmount = codes.size();
 	file->put(codeAmount);
 
-	//character as 8 bits 
-	for (auto const &it1 : codes)
-	{		
-		unsigned char m_char = it1.first[0];
-		file->put(m_char);	
+	//write huffman codes to file
+	for (auto const &huffTableIt : codes)
+	{
+		//write character
+		string m_char = huffTableIt.first;
+		(*file) << m_char;
 
-		//size of code
-		char sizeOfCode = it1.second.size();
-		//file->put(sizeOfCode);
-		*file << sizeOfCode;
+		//write out the size of the code
+		unsigned char sizeOfCode = huffTableIt.second.size();
+		file->put(sizeOfCode);
 
-		unsigned char code = 0;
-		//followed by code
-		for (unsigned bit = 0; bit != sizeOfCode; ++bit)
-		{
-			if (bit < it1.second.length())
-			{
-				code |= (it1.second[bit] & 1) << bit;
-			}
-			else
-			{
-				code |= 1 << bit;
-			}
-
-		} 
-		file->put(code);	
+		//Write out the actual code
+		*file << huffTableIt.second;
 	}	
 
-	file->put(' ');
 
-	//write out bitstream 
+	//write out message 
 	for (int i = 0; i < currentCode.length(); i +=8)
 	{
 		unsigned char byte = 0;
@@ -267,65 +257,98 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	delete inputMap;
 	delete file;
 }
-
-
-void huffmanTree::decompress()
+/*DECOMPRESSION FUNCTIONS*/
+//get tree reads the file and returns the hufmman table with characters and huffman codes
+void huffmanTree::getTree(map<string, string> & huffCodeMap, std::ifstream *outputfile)
 {
 	char fileBit;
 	char code;
 	int amountOfCodes;
 	int sizeOfCode;
-	
-	map<string, string>* codeMap = new map<string,string>;
 
-	//open/create file to write bit stream too
-	std::ifstream *file = new std::ifstream;
-	//open output file and clear content 
-	file->open("output.dat", std::ios::binary | std::ios::in);
-
-	
-	file->get(fileBit);
+	//get the amount of codes stored in file
+	outputfile->get(fileBit);
 	amountOfCodes = fileBit;
 
+	//loop until code amount has been met
 	for (int i = 0; i < amountOfCodes; i ++)
 	{
 		//get the character
-		file->get(fileBit);
+		outputfile->get(fileBit);
 		unsigned char bit = fileBit;
 		
 		//get size of code
-		file->get(fileBit);
+		outputfile->get(fileBit);
 		int codeSize = fileBit;
 
-		////get code
-		file->get(fileBit);
-		unsigned char temp = fileBit;
-		
-		string binary;
-		for (unsigned char i = 128, j = 0; i > 0; i >>= 1, j++)
-		{
-			if (j == codeSize)
-			{
-				break;
-			}
-			//binary += temp&i ? '1':'0';
-
-			binary += (temp % 2) + '0';
-			temp /= 2;
+		//get code as binary string
+		string binaryString;
+		//loop for code size
+		for (int i = 0; i < codeSize; i++)
+		{	
+			//pull out bit and append to binary string
+			outputfile->get(fileBit);
+			binaryString += fileBit;
 		}
 
-		string gawd;
-		gawd.push_back(bit);
-		codeMap->insert(std::make_pair(gawd, binary));
-
+		//turn character into string
+		string character;
+		character.push_back(bit);
+		
+		//push into map
+		huffCodeMap.insert(std::make_pair(character, binaryString));
 	}
-	
-	file->close();
-
-	cout<<"Huffman Codes From File: " << endl;
-	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
-	{
-		cout << it->first << " " << it->second << endl;
-	}
-
 }
+//get message reads the file and returns its contense as a stream of 1's and 0's 
+string huffmanTree::getMessage(std::ifstream *outputfile)
+{
+	char fileBit;
+	string message;
+	//loop over the rest of the file to get compressed message
+	while(!(outputfile->eof()))
+	{
+		//get the next bit
+		outputfile->get(fileBit);
+		unsigned char bit = fileBit;
+
+		//get 8 bit binary 
+		string binaryString;
+		for (unsigned char i = 128, j = 0; i > 0; i >>= 1, j++)
+		{
+			binaryString += (bit % 2) + '0';
+			bit /= 2;
+		} 		
+
+		//place binary string into message
+		message += binaryString;
+	}
+
+	return message;
+}
+
+void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string message)
+{
+	//starting positon for substring
+	int startPos = 0;
+
+	//loop over message length
+	for (int i = 0; i < message.length(); i ++)
+	{
+		//loop over map
+		for(auto it = huffCodeMap.cbegin(); it != huffCodeMap.cend(); ++it)
+		{
+			//get current code at map pos
+			string binaryString = it->second;
+			//get the current binary sub string
+			string binarySub = message.substr(startPos, it->second.length());
+			if(binarySub == binaryString)
+			{
+				//if match is found output character
+				cout << it->first;
+				//move along the starting position
+				startPos = startPos + it->second.length();
+			}
+		}		
+	}
+}
+

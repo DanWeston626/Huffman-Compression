@@ -10,12 +10,12 @@ int main ()
 	
 	//create vector and push back random values
 	std::vector<int>* b_data = new std::vector<int>;
-	(*b_data).push_back(12);
-	(*b_data).push_back(7);
-	(*b_data).push_back(10);
-	(*b_data).push_back(16);
-	(*b_data).push_back(22);
-	(*b_data).push_back(9);
+	(*b_data).push_back(0);
+	(*b_data).push_back(1);
+	(*b_data).push_back(0);
+	(*b_data).push_back(1);
+	(*b_data).push_back(0);
+	(*b_data).push_back(1);
 
 	//create new node - this is the root
 	node* treeRoot = new node;
