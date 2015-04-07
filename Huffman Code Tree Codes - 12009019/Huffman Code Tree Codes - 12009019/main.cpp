@@ -44,8 +44,8 @@ void main ()
 
 	//generate huffman codes
 	string codeString;
-	huffTree->generateCode(parentNode->leftChild, (*codeMap), codeString);
-	huffTree->generateCode(parentNode->rightChild, (*codeMap), codeString);
+	huffTree->generateCode(parentNode, (*codeMap), codeString);
+	//huffTree->generateCode(parentNode->rightChild, (*codeMap), codeString);
 	
 	//print codes
 	cout<<endl;
@@ -54,12 +54,9 @@ void main ()
 	{
 		cout << it->first << " " << it->second << endl;
 	}
-
-	string huffmanTable;
-	huffTree->encodeTree(parentNode, huffmanTable);
-
+	
 	//compress data
-	huffTree->compress((*codeMap), *fileContent, parentNode, huffmanTable);
+	huffTree->compress((*codeMap), *fileContent);
 
 
 	//pause console

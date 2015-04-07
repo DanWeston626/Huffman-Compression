@@ -148,14 +148,14 @@ void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, st
 	}
 }
 
-void huffmanTree::compress(map<string, string> &codes, string input, data* parentNode, string _huffmanTree)
+void huffmanTree::compress(map<string, string> &codes, string input)
 {
 	//iterator for codeMap
 	map<string, string>::iterator* inputMap = new map<string, string>::iterator;
 	
 	string bitStream;
 	string currentCode;
-
+	
 	//loop over the input string length
 	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
 	{
@@ -187,18 +187,43 @@ void huffmanTree::compress(map<string, string> &codes, string input, data* paren
 		}
 	}
 
-	//open/create file to write bit stream too
+		//open/create file to write bit stream too
 	std::fstream *file = new std::fstream;
-
 	//open output file and clear content 
 	file->open("output.dat", std::fstream::out | std::fstream::trunc);
 
-	//write out encoded tree
-	for(int i = 0; i < _huffmanTree.length();i ++)
-	{
-		unsigned char huffbit = _huffmanTree[i];
-		file->put(huffbit);
-	}
+	//write out number of codes
+	unsigned char codeAmount = codes.size();
+	file->put(codeAmount);
+
+	//character as 8 bits 
+	for (auto const &it1 : codes)
+	{		
+		char m_char = it1.first[0];
+		file->put(m_char);	
+
+		//size of code
+		const char sizeOfCode = it1.second.size();
+		file->put(sizeOfCode);	
+
+		unsigned char code = 0;
+		//followed by code
+		for (unsigned bit = 0; bit != 8; ++bit)
+		{
+			if (bit < it1.second.length())
+			{
+				code |= (it1.second[bit] & 1) << bit;
+			}
+			else
+			{
+				code |= 1 << bit;
+			}
+
+		} 
+		file->put(code);	
+
+
+	}	
 
 	file->put(' ');
 
@@ -236,27 +261,11 @@ void huffmanTree::compress(map<string, string> &codes, string input, data* paren
 		//place new byte in file
 		file->put(byte);
 	}
+
 	//close file
 	file->close();
 	//clean up objects 
 	delete inputMap;
 }
 
-void huffmanTree::encodeTree(data* currentNode, string &stream)
-{
-	static string byte = "";
-	//if node is a leaf node
-	if((*currentNode).leftChild == nullptr && (*currentNode).rightChild == nullptr)
-	{
-		byte += "1";
-		byte += currentNode->letter;
-	}
-	else
-	{
-		byte += "0";
-		encodeTree(currentNode->leftChild, stream + "0");
-		encodeTree(currentNode->rightChild, stream);
-	}	
 
-	stream = byte;
-}
