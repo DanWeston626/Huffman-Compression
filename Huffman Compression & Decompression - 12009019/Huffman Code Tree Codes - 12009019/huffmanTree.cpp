@@ -2,9 +2,7 @@
 
 #include <iterator> 
 #include <string>
-#include <bitset>
 
-using namespace std;
 //open file and return contense in a string variable
 string huffmanTree::returnFile(string fileName)
 {	
@@ -14,43 +12,18 @@ string huffmanTree::returnFile(string fileName)
 	/*open text file*/
 	infile.open(fileName);
 	/*read file, store contense to message string*/
-	getline(infile,message);
-	/*close file*/
-	infile.close();
+	if (infile.is_open())
+	{
+		getline(infile,message);
+		/*close file*/
+		infile.close();
+	}
+	else
+	{
+		cout<< "Error! File does not exsit! " << endl;
+	}
 	/*return file*/
 	return message;
-}
-
-/*place the charatcers of the string into the map, if the character is already in the map
-increment the frequency of the charatcer*/
-void huffmanTree::calFreq(map<char, int> &freqMap, string input)
-{
-    //iterator for &freqMap
-	map<char, int>::iterator* inputMap = new map<char, int>::iterator;
-
-	//loop over the input string length
-	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
-	{
-		//take the current charatcer of the string and assign to char
-		char currentChar = input[chrPos];
-
-		//search the map for current char
-		(*inputMap) = freqMap.find(currentChar);
-
-		//if current letter was not located in map
-		if((*inputMap) == freqMap.end())
-		{
-			//add current letter and +1 freq to map
-			freqMap.insert(std::make_pair(currentChar,1));
-		}
-		else 
-		{
-			//increment the character frequency
-			(*inputMap)->second++;
-		}
-	}
-	//delete dynamic map
-	delete inputMap;
 }
 
 //populate priority queue for huffman code tree
@@ -150,6 +123,7 @@ void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, st
 	}
 }
 
+//function compresses the message in the text file producing a compressed text file
 void huffmanTree::compress(map<string, string> &codes, string input)
 {
 	//iterator for codeMap
@@ -157,7 +131,6 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	
 	string bitStream;
 	string currentCode;
-	
 	//loop over the input string length
 	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
 	{
@@ -169,25 +142,9 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		(*inputMap) = codes.find(currentChar);
 		//add current byte to stream
 		currentCode += (*inputMap)->second;	
-	
+		
 	}
-	
-	//if there are left over bits add extra 0's as overflow
-	bool loop = true;
-	while(loop)
-	{
-		//if the current string length isnt divisble by 8
-		if (!(currentCode.length() % 8 == 0))
-		{
-			//add extra zeros
-			currentCode += "0";
-		}
-		//string is divisble by 8 end
-		else 
-		{
-			loop = false;
-		}
-	}
+		
 
 	//open/create file to write bit stream too
 	std::fstream *file = new std::fstream;
@@ -196,7 +153,7 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 
 	//write out number of codes
 	unsigned char codeAmount = codes.size();
-	file->put(codeAmount);
+	file->put(codeAmount);	
 
 	//write huffman codes to file
 	for (auto const &huffTableIt : codes)
@@ -240,7 +197,7 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 			}
 			else
 			{
-				byte |= 1 << bit;
+				byte |= 0 << bit;
 			}
 
 		} 
@@ -253,5 +210,107 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	//clean up objects 
 	delete inputMap;
 	delete file;
+}
+
+
+/*DECOMPRESSION FUNCTIONS*/
+//get tree reads the file and returns the hufmman table with characters and huffman codes
+void huffmanTree::getTree(map<string, string> & huffCodeMap, std::ifstream *outputfile)
+{
+	char fileBit;
+	char code;
+	int amountOfCodes;
+	int sizeOfCode;
+
+	//get the amount of codes stored in file
+	outputfile->get(fileBit);
+	amountOfCodes = fileBit;
+
+	//loop until code amount has been met
+	for (int i = 0; i < amountOfCodes; i ++)
+	{
+		//get the character
+		outputfile->get(fileBit);
+		unsigned char bit = fileBit;
+		
+		//get size of code
+		outputfile->get(fileBit);
+		int codeSize = fileBit;
+
+		//get code as binary string
+		string binaryString;
+		//loop for code size
+		for (int i = 0; i < codeSize; i++)
+		{	
+			//pull out bit and append to binary string
+			outputfile->get(fileBit);
+			binaryString += fileBit;
+		}
+
+		//turn character into string
+		string character;
+		character.push_back(bit);
+		
+		//push into map
+		huffCodeMap.insert(std::make_pair(character, binaryString));
+	}
+}
+//get message reads the file and returns its contense as a stream of 1's and 0's 
+string huffmanTree::getMessage(std::ifstream *outputfile)
+{
+	char fileBit;
+	string message;
+	unsigned char leng;
+
+	//loop over the rest of the file to get compressed message
+	while(outputfile->get(fileBit))
+	{
+		//get the next bit
+		//outputfile->get(fileBit);
+		unsigned char bit = fileBit;
+
+		//get 8 bit binary 
+		string binaryString;
+		for (unsigned char i = 128, j = 0; i > 0; i >>= 1, j++)
+		{
+			binaryString += (bit % 2) + '0';
+			bit /= 2;
+		} 		
+
+		//place binary string into message
+		message += binaryString;
+	}
+
+	return message;
+}
+//decompress message takes the string from get message and 
+void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string message)
+{
+	//starting positon for substring
+	int startPos = 0;
+
+	//loop over message length
+	for (int i = 0; i < message.length(); i ++)
+	{
+		//loop over map
+		for(auto it = huffCodeMap.cbegin(); it != huffCodeMap.cend(); ++it)
+		{
+			//get current code at map pos
+			string binaryString = it->second;
+			//get the current binary sub string
+			string binarySub = message.substr(startPos, it->second.length());
+			
+			if(binarySub == binaryString)
+			{
+				//if match is found output character
+				cout << it->first;
+				//move along the starting position
+				startPos = startPos + it->second.length();
+				break;
+			}
+		}		
+	}
+
+
 }
 

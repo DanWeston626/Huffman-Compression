@@ -1,20 +1,18 @@
 #include "huffmanTree.h"
 #include <iostream>
 #include <string>
-
 #include <fstream>
 
 using namespace std;
 
 int compressFile();
-int decompressFile();
 
 void main ()
 {
-	//print menu 
-	
+		
 	bool loop = true;
 
+	//loop and print menu
 	while (loop)
 	{
 		int choice;
@@ -22,8 +20,8 @@ void main ()
 		cout << endl;
 		cout << "\t****HUFFMAN COMPRESSION****" << endl;
 		cout << "\t1. Compress File" << endl;
-		cout << "\t2. Decompress File" << endl;
-		cout << "\t3. Exit" << endl;
+		cout << "\t2. Exit" << endl;
+		cout << endl; 
 		cout << "\t";
 		cin >> choice;
 		cout << endl;
@@ -32,15 +30,11 @@ void main ()
 		{
 			compressFile();
 		}
-		else if (choice == 2)
-		{
-			decompressFile();
-		}
 		else 
 		{
 			loop = false;
 		}
-
+			
 	}
 	
 }
@@ -57,13 +51,8 @@ int compressFile()
 	map<string, string>* codeMap = new map<string,string>;
 	priority_queue<data*, vector<data*>, compare>* huffmanQueue = new priority_queue<data*, vector<data*>, compare>;
 
-	//ask for file name
-	cout << "Enter a filename: ";
-	cin >> *inputFile;
-	cout << endl;
-
 	//get contense of file
-	*fileContent = huffTree->returnFile(*inputFile);
+	*fileContent = huffTree->returnFile("richardiii.txt");
 
 	//create frequency map of file 
 	huffTree->calFreq(*freqMap, *fileContent);
@@ -93,9 +82,13 @@ int compressFile()
 		cout << it->first << " " << it->second << endl;
 	}
 	
+	cout << endl;
+	cout << "Compressing and Saving data to 'output.dat'" << endl;
+
 	//compress data
 	huffTree->compress((*codeMap), *fileContent);
 
+	//clean up objects
 	delete huffmanQueue;
 	delete parentNode;
 	delete freqMap;
@@ -103,47 +96,8 @@ int compressFile()
 	delete fileContent;
 	delete inputFile;
 
-
+	//return to menu
 	return 0;
 }
 
-int decompressFile()
-{
-	huffmanTree* huffTree = new huffmanTree();	
-	string* decompress = new string;
-	data* decompressNode = new data;
-	map<string, string>* codeMap = new map<string,string>;
-		//empty the code map
-	(*codeMap).clear();
 
-	//open/create file to write bit stream too
-	std::ifstream *file = new std::ifstream;
-
-	//open output file and clear content 
-	file->open("output.dat", std::ios::binary | std::ios::in);
-
-	//decompress file and get tree
-	huffTree->getTree((*codeMap), file);
-
-	//get compressed bitstream
-	*decompress = huffTree->getMessage(file);
-	file->close();
-
-	cout<<endl;
-	cout<<"Huffman Codes From File: " << endl;
-	for(auto it = (*codeMap).cbegin(); it != (*codeMap).cend(); ++it)
-	{
-		cout << it->first << " " << it->second << endl;
-	}
-
-	huffTree->decompressMessage((*codeMap), *decompress);
-	
-
-	//clean up objects 
-	delete file;
-	delete decompress;
-	delete huffTree;
-	delete decompressNode;
-
-	return 0;
-}

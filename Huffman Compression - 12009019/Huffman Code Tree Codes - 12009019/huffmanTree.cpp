@@ -14,43 +14,18 @@ string huffmanTree::returnFile(string fileName)
 	/*open text file*/
 	infile.open(fileName);
 	/*read file, store contense to message string*/
-	getline(infile,message);
-	/*close file*/
-	infile.close();
+	if (infile.is_open())
+	{
+		getline(infile,message);
+		/*close file*/
+		infile.close();
+	}
+	else
+	{
+		cout<< "Error! File does not exsit! " << endl;
+	}
 	/*return file*/
 	return message;
-}
-
-/*place the charatcers of the string into the map, if the character is already in the map
-increment the frequency of the charatcer*/
-void huffmanTree::calFreq(map<char, int> &freqMap, string input)
-{
-    //iterator for &freqMap
-	map<char, int>::iterator* inputMap = new map<char, int>::iterator;
-
-	//loop over the input string length
-	for (int chrPos = 0; chrPos < input.length(); chrPos ++)
-	{
-		//take the current charatcer of the string and assign to char
-		char currentChar = input[chrPos];
-
-		//search the map for current char
-		(*inputMap) = freqMap.find(currentChar);
-
-		//if current letter was not located in map
-		if((*inputMap) == freqMap.end())
-		{
-			//add current letter and +1 freq to map
-			freqMap.insert(std::make_pair(currentChar,1));
-		}
-		else 
-		{
-			//increment the character frequency
-			(*inputMap)->second++;
-		}
-	}
-	//delete dynamic map
-	delete inputMap;
 }
 
 //populate priority queue for huffman code tree
@@ -150,6 +125,7 @@ void huffmanTree::generateCode(data* currentNode, map<string, string> &codes, st
 	}
 }
 
+//function compresses the message in the text file producing a compressed text file
 void huffmanTree::compress(map<string, string> &codes, string input)
 {
 	//iterator for codeMap
@@ -250,8 +226,12 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 
 	//close file
 	file->close();
+
+	cout << "File has been compressed - output.dat created!" << endl; 
 	//clean up objects 
 	delete inputMap;
 	delete file;
 }
+
+
 

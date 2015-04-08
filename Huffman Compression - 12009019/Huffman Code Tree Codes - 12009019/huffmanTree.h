@@ -3,7 +3,9 @@ a huffman code tree in the createHuffmanTree function*/
 
 #ifndef _HUFFMANTREE_H_
 #define _HUFFMANTREE_H_
-#include "huffmanData.h"
+#include "huffmanNode.h"
+#include "nodeComparator.h"
+
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -27,13 +29,12 @@ class huffmanTree
 public:
 	//returns contense of a given file
 	string returnFile(string message);
-	void calFreq(map<char, int> & freqMap, string input);
 
 	//fills priority queue with leaf nodes
 	void createLeafNodes(map<char, int>* freqMap, priority_queue<data*, vector<data*>, compare>* huffmanQueue);
 	//uses leaf nodes for createLeafNodes to create a priority tree
 	data createHuffmanTree(priority_queue<data*, vector<data*>, compare>* huffmanTree);
-	
+
 	//generates the set of huffman codes from a huffman tree
 	void generateCode(data *tree,  map<string, string> &codes, string code);
 	
