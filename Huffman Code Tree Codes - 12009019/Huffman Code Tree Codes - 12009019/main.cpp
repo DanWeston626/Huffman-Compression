@@ -6,40 +6,46 @@
 
 using namespace std;
 
-void compressFile();
-void decompressFile();
+int compressFile();
+int decompressFile();
 
 void main ()
 {
 	//print menu 
 	
-	int choice;
-	cout << "\t****HUFFMAN COMPRESSION****" << endl;
-	cout << "\t1. Compress File" << endl;
-	cout << "\t2. Decompress File" << endl;
-	cout << "\t3. Exit" << endl;
+	bool loop = true;
 
-	cin >> choice;
-
-	switch (choice)
+	while (loop)
 	{
-		case 1:
+		int choice;
+		cout << endl;
+		cout << endl;
+		cout << "\t****HUFFMAN COMPRESSION****" << endl;
+		cout << "\t1. Compress File" << endl;
+		cout << "\t2. Decompress File" << endl;
+		cout << "\t3. Exit" << endl;
+		cout << "\t";
+		cin >> choice;
+		cout << endl;
+
+		if (choice == 1)
 		{
 			compressFile();
 		}
-		case 2:
+		else if (choice == 2)
 		{
 			decompressFile();
 		}
-		case 3:
+		else 
 		{
-			decompressFile();
+			loop = false;
 		}
+
 	}
 	
 }
 
-void compressFile()
+int compressFile()
 {
 	//Objects
 	huffmanTree* huffTree = new huffmanTree();	
@@ -98,10 +104,10 @@ void compressFile()
 	delete inputFile;
 
 
-	main();
+	return 0;
 }
 
-void decompressFile()
+int decompressFile()
 {
 	huffmanTree* huffTree = new huffmanTree();	
 	string* decompress = new string;
@@ -132,16 +138,12 @@ void decompressFile()
 
 	huffTree->decompressMessage((*codeMap), *decompress);
 	
-	//pause console
-	cin.ignore();
-	cin.get();	
 
 	//clean up objects 
 	delete file;
 	delete decompress;
 	delete huffTree;
 	delete decompressNode;
-	delete huffTree;
 
-	main();
+	return 0;
 }

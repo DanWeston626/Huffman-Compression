@@ -171,9 +171,7 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		currentCode += (*inputMap)->second;	
 	
 	}
-
-
-
+	
 	//if there are left over bits add extra 0's as overflow
 	bool loop = true;
 	while(loop)
@@ -214,7 +212,6 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		//Write out the actual code
 		*file << huffTableIt.second;
 	}	
-
 
 	//write out message 
 	for (int i = 0; i < currentCode.length(); i +=8)
@@ -304,6 +301,7 @@ string huffmanTree::getMessage(std::ifstream *outputfile)
 {
 	char fileBit;
 	string message;
+
 	//loop over the rest of the file to get compressed message
 	while(!(outputfile->eof()))
 	{
@@ -341,14 +339,17 @@ void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string me
 			string binaryString = it->second;
 			//get the current binary sub string
 			string binarySub = message.substr(startPos, it->second.length());
+
 			if(binarySub == binaryString)
 			{
 				//if match is found output character
 				cout << it->first;
 				//move along the starting position
 				startPos = startPos + it->second.length();
+				break;
 			}
 		}		
 	}
+
 }
 
