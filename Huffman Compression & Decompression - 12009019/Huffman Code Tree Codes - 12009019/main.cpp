@@ -125,6 +125,7 @@ int decompressFile()
 	map<string, string>* codeMap = new map<string,string>;
 	std::ifstream *file = new std::ifstream;
 	string* fileName = new string;
+	int* paddingBits = new int;
 
 	//ask for file name
 	cout << "Enter a filename: " << endl;
@@ -142,7 +143,7 @@ int decompressFile()
 		huffTree->getTree((*codeMap), file);
 
 		//get compressed bitstream
-		*decompress = huffTree->getMessage(file);
+		*decompress = huffTree->getMessage(file, *paddingBits);
 		file->close();
 
 		cout<<endl;
@@ -152,7 +153,7 @@ int decompressFile()
 			cout << it->first << " " << it->second << endl;
 		}
 
-		huffTree->decompressMessage((*codeMap), *decompress);
+		huffTree->decompressMessage((*codeMap), *decompress, *paddingBits);
 	}
 	else 
 	{
@@ -165,6 +166,7 @@ int decompressFile()
 	delete decompress;
 	delete huffTree;
 	delete decompressNode;
+	delete paddingBits;
 
 	return 0;
 }

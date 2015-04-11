@@ -2,6 +2,8 @@
 
 #include <iterator> 
 #include <string>
+#include <bitset>
+
 
 //open file and return contense in a string variable
 string huffmanTree::returnFile(string fileName)
@@ -144,6 +146,19 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		currentCode += (*inputMap)->second;	
 		
 	}
+
+	//get the current length of the string 
+	int length = input.length();
+	
+	//if the length is not divisble by 8 add padding
+	int padAmount = 0;
+	while (!(length % 8 == 0))
+	{
+		currentCode += "0";
+		length = currentCode.length();
+
+		padAmount++;
+	}
 		
 
 	//open/create file to write bit stream too
@@ -166,9 +181,27 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 		unsigned char sizeOfCode = huffTableIt.second.size();
 		file->put(sizeOfCode);
 
+		int length = huffTableIt.second.length();
+
 		//Write out the actual code
 		*file << huffTableIt.second;
+
+
+		//unsigned char byte = 0;
+		//for (unsigned bit = 0; bit != huffTableIt.second.length(); ++bit)
+		//{
+		//	if (bit < huffTableIt.second.length())
+		//	{
+		//		byte |= (huffTableIt.second[bit] & 1) << bit;
+		//	}
+		//}
+		//file->put(byte);
 	}	
+
+	//write out number of padding bits
+	unsigned char codePadding = padAmount;
+	file->put(padAmount);	
+
 
 	//write out message 
 	for (int i = 0; i < currentCode.length(); i +=8)
@@ -198,6 +231,7 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 			else
 			{
 				byte |= 0 << bit;
+				padAmount++;
 			}
 
 		} 
@@ -211,7 +245,6 @@ void huffmanTree::compress(map<string, string> &codes, string input)
 	delete inputMap;
 	delete file;
 }
-
 
 /*DECOMPRESSION FUNCTIONS*/
 //get tree reads the file and returns the hufmman table with characters and huffman codes
@@ -236,6 +269,7 @@ void huffmanTree::getTree(map<string, string> & huffCodeMap, std::ifstream *outp
 		//get size of code
 		outputfile->get(fileBit);
 		int codeSize = fileBit;
+		
 
 		//get code as binary string
 		string binaryString;
@@ -256,11 +290,15 @@ void huffmanTree::getTree(map<string, string> & huffCodeMap, std::ifstream *outp
 	}
 }
 //get message reads the file and returns its contense as a stream of 1's and 0's 
-string huffmanTree::getMessage(std::ifstream *outputfile)
+string huffmanTree::getMessage(std::ifstream *outputfile, int &paddingBits)
 {
 	char fileBit;
 	string message;
 	unsigned char leng;
+	
+	//get the amount of padding bits 
+	outputfile->get(fileBit);
+	paddingBits = fileBit;
 
 	//loop over the rest of the file to get compressed message
 	while(outputfile->get(fileBit))
@@ -284,14 +322,21 @@ string huffmanTree::getMessage(std::ifstream *outputfile)
 	return message;
 }
 //decompress message takes the string from get message and 
-void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string message)
+void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string message,int paddingBits)
 {
 	//starting positon for substring
 	int startPos = 0;
 
+
+	int length = 0;// message.length() - paddingBits;
 	//loop over message length
-	for (int i = 0; i < message.length(); i ++)
+	for (int i = 0; i < message.length(); i ++)	
 	{
+		//if the amount of characters found is equal to the length minus padding STOP 
+		if (length == message.length() - paddingBits)
+		{
+			break;
+		}
 		//loop over map
 		for(auto it = huffCodeMap.cbegin(); it != huffCodeMap.cend(); ++it)
 		{
@@ -306,11 +351,18 @@ void huffmanTree::decompressMessage(map<string, string> & huffCodeMap, string me
 				cout << it->first;
 				//move along the starting position
 				startPos = startPos + it->second.length();
+
+				//add up characters
+				length = length + it->second.length();
+							
 				break;
 			}
+
 		}		
 	}
 
+
+	
 
 }
 

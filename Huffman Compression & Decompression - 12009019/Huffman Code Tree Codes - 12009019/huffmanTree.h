@@ -45,9 +45,9 @@ public:
 	void getTree(map<string, string> & huffCodeMap, std::ifstream *outputFile);
 
 	//decompress message from file
-	string getMessage(std::ifstream *outputfile);
+	string getMessage(std::ifstream *outputfile, int &paddingBits);
 
-	void decompressMessage(map<string, string> & huffCodeMap, string message);
+	void decompressMessage(map<string, string> & huffCodeMap, string message,int paddingBits);
 
 };
 #endif
